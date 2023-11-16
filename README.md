@@ -59,24 +59,14 @@ Port forward Prometheus to access it as a service
 kubectl port-forward service/kube-prometheus-stack-prometheus 9090
 ```
 
-Run this to get the yaml output of the kube-prometheus-stack-grafana service:
+Port forward Grafana to access it from localhost:
 ```shell
-kubectl get service/kube-prometheus-stack-grafana -oyaml > grafana-patch.yaml
+kubectl port-forward deployment/kube-prometheus-stack-grafana 3000
 ```
 
-This creates a file called grafana.yaml. Now add `nodePort: 30001` and change it to `type: LoadBalancer`.
-Patch grafana to make it accessible via localhost:
-```shell
-kubectl patch service kube-prometheus-stack-grafana --patch-file grafana-patch.yaml
-kubectl get svc
-```
-
-You should now see that `kube-prometheus-stack-grafana` is a LoadBalancer and available on localhost.
-
-If using docker desktop on a mac, you will need a port forward to access mongo express or grafana from localhost:
+Port forward mongo express to access it from localhost:
 ```shell
 kubectl port-forward service/mongo-express-service 8081
-kubectl port-forward service/kube-prometheus-stack-grafana :80
 ```
 
 Now install and port forward the MongoDB exporter to collect metrics from mongodb:
@@ -91,13 +81,17 @@ kubectl port-forward service/mongodb-exporter-prometheus-mongodb-exporter 9216
 ```
 
 ## Usage
-
-Navigate to the port forwarded URL for grafana. Example: http://127.0.0.1:63024
+Navigate to the port forwarded URL for grafana: http://127.0.0.1:3000
 
 Default login for grafana:
 Username: admin
 Password: prom-operator
 
+Navigate to Prometheus and check targets: http://127.0.0.1:9090/targets
+
+Navigate to Mongo Express and make some changes: http://127.0.0.1:8081/
+
+Of course, this demo is not stateful, so there is no backend persistent disk for MongoDB.  As such, any MongoDB changes will be gone if the cluster or pod restarts.
 
 ## Tear Down
 Tear down prometheus and grafana:
