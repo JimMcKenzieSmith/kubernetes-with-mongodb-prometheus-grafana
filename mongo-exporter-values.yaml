@@ -95,7 +95,7 @@ serviceMonitor:
   enabled: true
   interval: 70s
   scrapeTimeout: 60s
-  namespace:
+  namespace: monitoring
   additionalLabels:
     release: kube-prometheus-stack
   targetLabels: []

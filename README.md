@@ -40,16 +40,22 @@ kubectl apply -f mongo-configmap.yaml
 kubectl apply -f mongo-express.yaml
 ```
 
+Create a `monitoring` namespace if you do not already have one:
+```shell
+kubectl create namespace monitoring
+```
+
 Install [Helm](https://helm.sh/docs/intro/install/)
 
 Setup Prometheus and Grafana with Helm:
 ```shell
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm repo update
-helm install kube-prometheus-stack prometheus-community/kube-prometheus-stack
+helm install kube-prometheus-stack prometheus-community/kube-prometheus-stack -f kube-prometheus-stack-values.yaml
+kubectl --namespace monitoring get pods
 ```
 
-You might need this patch if running Docker Desktop on a Mac:
+You may need this patch if running Docker Desktop on a Mac:
 ```shell
 kubectl patch daemonset.apps/kube-prometheus-stack-prometheus-node-exporter --type "json" -p '[{"op": "remove", "path" : "/spec/template/spec/containers/0/volumeMounts/2/mountPropagation"}]'
 ```
@@ -72,7 +78,7 @@ kubectl port-forward service/mongo-express-service 8081
 Now install and port forward the MongoDB exporter to collect metrics from mongodb:
 
 ```shell
-helm install mongodb-exporter prometheus-community/prometheus-mongodb-exporter --values mongo-exporter-values.yaml
+helm install mongodb-exporter prometheus-community/prometheus-mongodb-exporter -f mongo-exporter-values.yaml
 ```
 
 Port forward if you want to check the /metrics endpoint:
